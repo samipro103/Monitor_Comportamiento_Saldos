@@ -1,0 +1,86 @@
+PARCHE - INFORME DE QUIEBRE ACUMULADO
+=====================================
+
+Repositorio revisado:
+samipro103/Monitor_Comportamiento_Saldos
+
+1) SUPABASE
+-----------
+Abre Supabase > SQL Editor > New query.
+Copia TODO el contenido de:
+
+  06_INFORME_QUIEBRE_MENSUAL.sql
+
+y pulsa Run.
+
+Esto crea la función segura:
+  public.web_quiebre_monthly(anio, mes, busqueda)
+
+No borra el histórico ni cambia la ingesta del agente.
+
+2) WEB
+------
+Copia:
+  quiebre-report.js
+
+dentro de la carpeta:
+  web\
+
+Debe quedar:
+  web\quiebre-report.js
+
+3) INDEX.HTML
+-------------
+Abre:
+  web\index.html
+
+Al final busca exactamente:
+  <script src="./app.js?v=24"></script>
+
+Y déjalo así:
+  <script src="./app.js?v=24"></script>
+  <script src="./quiebre-report.js?v=1"></script>
+
+Guarda.
+
+4) GITHUB DESKTOP
+-----------------
+En GitHub Desktop aparecerán los cambios.
+Summary sugerido:
+  Agregar informe mensual de quiebre acumulado
+
+Pulsa:
+  Commit to main
+Luego:
+  Push origin
+
+Si Vercel está conectado al repo, hará el despliegue automáticamente.
+
+5) USO
+------
+Al entrar a la web aparecerá una nueva opción:
+  Informe de quiebre
+
+Por defecto selecciona el mes anterior. Para septiembre 1 de 2026,
+mostrará agosto 2026.
+
+El informe calcula:
+- Clientes con quiebre real.
+- Horas acumuladas en saldo $0.00.
+- Entradas a quiebre durante el mes.
+- Arrastre de quiebre iniciado el mes anterior.
+- Mayor quiebre continuo.
+- Saldo al cierre del mes.
+- Casos >=24h, >=48h y >=72h.
+- Estado al cierre.
+- Exportación CSV para Excel.
+- Impresión / PDF desde el navegador.
+
+REGLA
+-----
+Quiebre real = transición de saldo positivo a $0.00.
+El tiempo se calcula desde la toma donde se observa $0.00 hasta la
+toma donde se observa recuperación, limitado al mes solicitado.
+
+Los clientes que siempre han estado en $0.00 y nunca registraron saldo
+positivo NO se mezclan con este informe; siguen tratados como BAJAS.

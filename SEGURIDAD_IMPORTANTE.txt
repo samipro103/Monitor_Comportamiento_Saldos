@@ -1,0 +1,18 @@
+IMPORTANTE - SEGURIDAD DEL REPOSITORIO
+======================================
+
+El repositorio fue subido como PUBLICO y el archivo config.json de la raiz
+contiene una clave privada de ingesta (ingest_key).
+
+ACCION INMEDIATA RECOMENDADA:
+1. Cambiar el repositorio a PRIVATE en GitHub.
+2. Rotar la ingest_key en Supabase y actualizar el config.json local del agente.
+3. No volver a versionar config.json real, agent.log ni agent_state.json.
+4. Agregar al .gitignore de la raiz:
+
+config.json
+agent.log
+agent_state.json
+
+El web/config.json usa una publishable key y puede vivir en frontend, pero la
+ingest_key del agente NO debe publicarse.
