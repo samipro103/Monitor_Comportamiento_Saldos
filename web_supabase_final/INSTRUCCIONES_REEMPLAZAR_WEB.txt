@@ -1,0 +1,20 @@
+IMPORTANTE - NO CREAR OTRO PROYECTO VERCEL
+
+Tu carpeta actualmente enlazada es:
+C:\Users\SAMUEL\Desktop\Monitor_Comportamiento_Saldos\web
+
+1. Cierra cualquier servidor local que use esa carpeta.
+2. Abre este ZIP.
+3. Copia TODOS los archivos de este ZIP dentro de la carpeta:
+   C:\Users\SAMUEL\Desktop\Monitor_Comportamiento_Saldos\web
+4. Acepta REEMPLAZAR los archivos existentes.
+5. NO borres la carpeta oculta .vercel que ya exista dentro de web.
+6. Desde la carpeta web ejecuta CONFIGURAR_WEB.bat.
+7. Ejecuta COMPROBAR_ANTES_DE_PUBLICAR.bat.
+8. Si todo dice OK, ejecuta PUBLICAR_MISMO_PROYECTO.bat.
+9. Abre el MISMO dominio de Vercel y haz Ctrl+F5.
+
+SEÑAL DE QUE YA ES LA VERSIÓN CORRECTA:
+- El botón superior dice "Actualizar vista".
+- NO dice "Actualizar datos".
+- La aplicación consulta Supabase con web_summary_deep.

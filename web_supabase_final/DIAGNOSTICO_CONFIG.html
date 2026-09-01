@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Diagnóstico config.json</title>
+</head>
+<body style="font-family:Segoe UI,Arial;background:#f4f7f9;padding:30px">
+<h2>Diagnóstico de configuración</h2>
+<pre id="out" style="background:#fff;border:1px solid #d8e0e7;padding:20px;line-height:1.55">Leyendo config.json...</pre>
+<script>
+(async()=>{
+  const o=document.getElementById('out');
+  try{
+    const r=await fetch('./config.json?v=24',{cache:'no-store'});
+    const raw=await r.text();
+    if(!r.ok) throw new Error('HTTP '+r.status+'\n'+raw);
+    const c=JSON.parse(raw);
+    const url=String(c.supabase_url||'').trim();
+    const key=String(c.supabase_publishable_key||'').trim();
+    o.textContent=
+      'config.json leído: SI\n\n'+
+      'SUPABASE_URL leído: '+(url?'SI':'NO')+'\n'+
+      (url?url+'\n':'')+
+      '\nPUBLISHABLE KEY leída: '+(key?'SI':'NO')+'\n'+
+      (key?key.slice(0,20)+'...\n':'')+
+      '\nURL válida: '+String(url.startsWith('https://')&&url.includes('.supabase.co'))+
+      '\nKEY válida: '+String(key.startsWith('sb_publishable_'))+
+      '\nKEY longitud: '+key.length;
+  }catch(e){
+    o.textContent='ERROR:\n'+e.message;
+  }
+})();
+</script>
+</body>
+</html>

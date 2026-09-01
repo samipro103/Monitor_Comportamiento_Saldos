@@ -1,0 +1,65 @@
+CONTROL DE SALDOS - WEB SUPABASE v2 HISTÓRICO PROFUNDO
+======================================================
+
+ESTA ES LA VERSIÓN VISUAL BASADA EN LA v1.4 QUE FUE APROBADA.
+
+PASOS
+-----
+1. Supabase -> SQL Editor.
+2. Ejecuta 05_WEB_HISTORICO_PROFUNDO.sql.
+3. No vuelvas a ejecutar las queries de carga ni borres datos.
+4. Ejecuta CONFIGURAR_WEB.bat.
+5. Usa la MISMA Project URL y Publishable Key de la web anterior.
+6. Ejecuta ABRIR_WEB_LOCAL.bat.
+7. Inicia sesión con el usuario de Supabase Authentication.
+
+LA INTERFAZ CONSERVA
+--------------------
+- Resumen
+- Atención
+- Bajas
+- Explorador
+- Configuración
+- Histórico profundo lateral
+- Todo / 24 h / 7 días / 30 días
+- Resumen diario
+- Movimientos
+- Exportación CSV individual
+- Lógica BAJA / ATENCIÓN / REACTIVADO / SIN MOVIMIENTO
+
+IMPORTANTE
+----------
+"Actualizar vista" NO procesa Drive. Solo consulta de nuevo Supabase.
+El agente Windows es quien mantiene la base central actualizada.
+
+PUBLICAR
+--------
+Cuando todo se vea bien:
+PUBLICAR_VERCEL.bat
+
+
+CORRECCIÓN v2.1
+---------------
+La web local ahora usa http://127.0.0.1:43211 para evitar que una versión
+anterior que todavía esté abierta en el puerto 43210 muestre su config.js.
+
+Orden recomendado:
+1. CONFIGURAR_WEB.bat
+2. VERIFICAR_CONFIG.bat
+3. ABRIR_WEB_LOCAL.bat
+4. Abrir http://127.0.0.1:43211/config.js y confirmar que salen los datos reales.
+5. Abrir http://127.0.0.1:43211
+
+
+v2.3 - CONFIG.JSON
+------------------
+Esta versión ya NO ejecuta config.js.
+
+Orden:
+1. CONFIGURAR_WEB.bat
+2. VERIFICAR_CONFIG.bat
+3. ABRIR_WEB_LOCAL.bat
+4. http://127.0.0.1:43213/DIAGNOSTICO_CONFIG.html
+5. http://127.0.0.1:43213
+
+La web carga config.json directamente.

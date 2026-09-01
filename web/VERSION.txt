@@ -1,0 +1,7 @@
+CONTROL DE SALDOS
+VERSIÓN: SUPABASE-V2.4
+TIPO: WEB NUBE
+DATOS: Supabase RPC web_summary_deep / web_clients_deep / web_client_detail
+
+SI EN LA WEB VES EL BOTÓN "Actualizar datos", NO ESTÁS VIENDO ESTA VERSIÓN.
+ESTA VERSIÓN MUESTRA EL BOTÓN "Actualizar vista".

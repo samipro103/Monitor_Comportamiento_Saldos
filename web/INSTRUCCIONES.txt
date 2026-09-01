@@ -1,0 +1,38 @@
+MONITOR DE SALDOS — DISEÑO v2.6
+=================================
+
+CAMBIOS
+-------
+- Fuente general más grande.
+- Títulos más legibles.
+- KPIs más fáciles de leer.
+- Navegación lateral más cómoda.
+- Botones y filtros más grandes.
+- Tablas con texto más claro.
+- Histórico profundo más legible.
+- Login más amigable.
+- Responsive mejorado para teléfono y tablet.
+- Las tablas conservan todas sus columnas y en móvil se deslizan horizontalmente.
+
+NO CAMBIA
+---------
+- Posiciones/secciones.
+- app.js.
+- config.json.
+- index.html.
+- Supabase.
+- SQL.
+- Login.
+- Datos.
+- Clasificaciones.
+- Histórico.
+- Filtros.
+- Proyecto/link de Vercel.
+
+PARA APLICAR
+------------
+1. Extrae TODO el ZIP.
+2. Ejecuta ACTUALIZAR_DISENO_Y_PUBLICAR.bat.
+3. Espera a que Vercel termine.
+4. En PC: abre el mismo link y presiona Ctrl+F5.
+5. En teléfono: cierra la página y vuelve a abrirla.

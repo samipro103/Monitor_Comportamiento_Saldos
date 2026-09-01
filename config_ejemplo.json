@@ -1,0 +1,8 @@
+{
+  "source_folder": "G:\\Mi unidad\\Saldos_Bitacora_Quiebre",
+  "supabase_url": "https://entrgavqmkmfwiugtigc.supabase.co",
+  "publishable_key": "sb_publishable_8a6W8_S5Xls47YnC_RGC6A_5ZEn3BN7",
+  "ingest_key": "c555a6dd805bddc409d2a702b86667e110bcf03f480827d8198cda9180612d7b",
+  "interval_minutes": 5,
+  "utc_offset": "-06:00"
+}

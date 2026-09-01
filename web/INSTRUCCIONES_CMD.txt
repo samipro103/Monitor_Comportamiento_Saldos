@@ -1,0 +1,36 @@
+DISEÑO v2.8 — EXECUTIVE RESPONSIVE
+
+REEMPLAZA SOLO:
+1. index.html
+2. styles.css
+
+EN:
+C:\Users\SAMUEL\Desktop\Monitor_Comportamiento_Saldos\web
+
+NO TOCAR:
+- app.js
+- config.json
+- .vercel
+- Supabase
+- SQL
+
+PUBLICAR DESDE CMD:
+
+cd /d "C:\Users\SAMUEL\Desktop\Monitor_Comportamiento_Saldos\web"
+npx vercel@latest --prod --yes
+
+DESPUÉS:
+PC -> Ctrl + F5
+TELÉFONO -> cerrar pestaña y volver a abrir.
+
+CAMBIOS v2.8:
+- móvil mucho más compacto y equilibrado
+- encabezado profesional
+- navegación móvil limpia
+- KPIs 2 columnas sin cards
+- mejor escala de números
+- menos espacio desperdiciado
+- lectura rápida en 2 columnas
+- tablas con scroll menos exagerado
+- drawer/histórico optimizado
+- conserva todas las funciones y datos
