@@ -171,8 +171,8 @@
       <div class="section-head">
         <div>
           <span class="eyebrow">QUIEBRE ACUMULADO</span>
-          <h2>Informe mensual de saldo $0.00</h2>
-          <p id="qrSubtitle">Tiempo observado en quiebre real por cliente.</p>
+          <h2>Informe mensual de quiebre ≤ $4.99</h2>
+          <p id="qrSubtitle">Tiempo observado con saldo de $4.99 o menos por cliente.</p>
         </div>
         <div class="qr-actions">
           <button id="qrPrint" class="btn secondary small" type="button">Imprimir / PDF</button>
@@ -192,7 +192,7 @@
         <div class="qr-kpi"><span>Horas acumuladas</span><b id="qrHours">—</b><small>Entre todos los clientes</small></div>
         <div class="qr-kpi"><span>Más de 24 h</span><b id="qr24">—</b><small>Casos relevantes</small></div>
         <div class="qr-kpi"><span>Más de 72 h</span><b id="qr72">—</b><small>Casos críticos</small></div>
-        <div class="qr-kpi"><span>En quiebre al cierre</span><b id="qrAtClose">—</b><small>Saldo $0.00</small></div>
+        <div class="qr-kpi"><span>En quiebre al cierre</span><b id="qrAtClose">—</b><small>Saldo ≤ $4.99</small></div>
       </div>
 
       <div id="qrCoverage" class="qr-note"><div><b>Cobertura del histórico</b><div>Cargando…</div></div></div>
@@ -259,17 +259,18 @@
     const year = Number(yearText), month = Number(monthText);
     if (!year || !month) throw new Error('Selecciona un mes válido.');
 
-    $('#qrRows').innerHTML = '<tr><td colspan="12"><div class="qr-loading">Calculando quiebre acumulado…</div></td></tr>';
+    $('#qrRows').innerHTML = '<tr><td colspan="12"><div class="qr-loading">Calculando tiempo acumulado con saldo ≤ $4.99…</div></td></tr>';
     $('#qrLoad').disabled = true;
     try {
       reportData = await rpc('web_quiebre_monthly', {p_year:year, p_month:month, p_query:null});
       const s = reportData.summary || {};
+      const limit = Number(reportData.quiebre_limit ?? 4.99);
       $('#qrClients').textContent = fmtNum(s.clients_with_quiebre);
       $('#qrHours').textContent = `${fmtNum(Number(s.total_hours || 0).toFixed(0))} h`;
       $('#qr24').textContent = fmtNum(s.over_24h);
       $('#qr72').textContent = fmtNum(s.over_72h);
       $('#qrAtClose').textContent = fmtNum(s.in_quiebre_at_close);
-      $('#qrSubtitle').textContent = `Quiebre acumulado de ${monthName(year, month)}. Solo cuenta tiempo observado en saldo $0.00 después de haber tenido saldo positivo.`;
+      $('#qrSubtitle').textContent = `Quiebre acumulado de ${monthName(year, month)}. Cuenta todo el tiempo observado con saldo ≤ $${limit.toFixed(2)}. Sale del quiebre cuando vuelve a $5.00 o más.`;
       $('#qrTableTitle').textContent = `Clientes con quiebre · ${monthName(year, month)}`;
 
       const cov = $('#qrCoverage');
@@ -301,7 +302,7 @@
     $('#qrResultCount').textContent = `${fmtNum(rows.length)} cliente(s), ordenados de mayor a menor quiebre.`;
     $('#qrEmpty').classList.toggle('hidden', rows.length > 0);
     body.innerHTML = rows.map(r => {
-      const stateClass = r.closing_state === 'EN QUIEBRE' ? 'zero' : (String(r.closing_state).includes('SALDO') && r.closing_state !== 'CON SALDO' ? 'low' : 'ok');
+      const stateClass = r.closing_state === 'EN QUIEBRE' ? 'zero' : 'ok';
       return `<tr>
         <td><span class="qr-level ${levelClass(r.level)}">${esc(r.level)}</span></td>
         <td><b>${esc(r.id_client)}</b></td>
@@ -327,6 +328,7 @@
     if (!reportData) return;
     const period = $('#qrPeriod')?.value || '';
     const s = reportData.summary || {};
+      const limit = Number(reportData.quiebre_limit ?? 4.99);
     const rows = [
       ['INFORME DE QUIEBRE ACUMULADO', period],
       ['Clientes con quiebre', s.clients_with_quiebre],

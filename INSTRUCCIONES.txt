@@ -1,8 +1,22 @@
-PARCHE - INFORME DE QUIEBRE ACUMULADO
-=====================================
+PARCHE CORREGIDO - INFORME DE QUIEBRE ACUMULADO <= $4.99
+===========================================================
 
-Repositorio revisado:
-samipro103/Monitor_Comportamiento_Saldos
+REGLA DEFINITIVA
+----------------
+QUIEBRE = saldo desde $0.00 hasta $4.99 inclusive.
+
+El quiebre comienza cuando el cliente entra a $4.99 o menos.
+El quiebre termina cuando vuelve a $5.00 o mas.
+
+Ejemplo:
+  10:00  $8.00   -> fuera de quiebre
+  14:00  $4.50   -> comienza quiebre
+  18:00  $3.00   -> sigue en el MISMO quiebre
+  08:00  $1.00   -> sigue en el MISMO quiebre
+  11:00  $7.00   -> termina quiebre
+
+El tiempo acumulado seria desde las 14:00 hasta las 11:00 del dia
+siguiente. Los cambios dentro de $0.00-$4.99 NO crean quiebres nuevos.
 
 1) SUPABASE
 -----------
@@ -13,74 +27,53 @@ Copia TODO el contenido de:
 
 y pulsa Run.
 
-Esto crea la función segura:
-  public.web_quiebre_monthly(anio, mes, busqueda)
+IMPORTANTE:
+Si ya habias ejecutado la version anterior que usaba $0.00,
+NO PASA NADA. Ejecuta este SQL corregido y reemplazara la funcion
+anterior con la regla <= $4.99.
 
-No borra el histórico ni cambia la ingesta del agente.
+No borra el historico ni modifica el agente.
 
 2) WEB
 ------
 Copia:
   quiebre-report.js
 
-dentro de la carpeta:
+dentro de:
   web\
 
-Debe quedar:
-  web\quiebre-report.js
+Si ya existe una version anterior, REEMPLAZALA.
 
 3) INDEX.HTML
 -------------
-Abre:
-  web\index.html
+Al final de web\index.html debe quedar:
 
-Al final busca exactamente:
   <script src="./app.js?v=24"></script>
+  <script src="./quiebre-report.js?v=2"></script>
 
-Y déjalo así:
-  <script src="./app.js?v=24"></script>
-  <script src="./quiebre-report.js?v=1"></script>
-
-Guarda.
+Si habias puesto ?v=1, cambialo por ?v=2 para evitar cache.
 
 4) GITHUB DESKTOP
 -----------------
-En GitHub Desktop aparecerán los cambios.
 Summary sugerido:
-  Agregar informe mensual de quiebre acumulado
+  Corregir quiebre a saldo menor o igual a 4.99
 
-Pulsa:
-  Commit to main
 Luego:
+  Commit to main
   Push origin
 
-Si Vercel está conectado al repo, hará el despliegue automáticamente.
-
-5) USO
-------
-Al entrar a la web aparecerá una nueva opción:
-  Informe de quiebre
-
-Por defecto selecciona el mes anterior. Para septiembre 1 de 2026,
-mostrará agosto 2026.
-
-El informe calcula:
-- Clientes con quiebre real.
-- Horas acumuladas en saldo $0.00.
-- Entradas a quiebre durante el mes.
-- Arrastre de quiebre iniciado el mes anterior.
-- Mayor quiebre continuo.
+5) INFORME
+----------
+El informe mensual mostrara:
+- Clientes que estuvieron en <= $4.99.
+- Horas acumuladas de quiebre.
+- Cantidad de entradas a quiebre.
+- Quiebres que venian desde el mes anterior.
+- Mayor periodo continuo en quiebre.
+- Recuperaciones: cuando vuelve a >= $5.00.
 - Saldo al cierre del mes.
 - Casos >=24h, >=48h y >=72h.
-- Estado al cierre.
-- Exportación CSV para Excel.
-- Impresión / PDF desde el navegador.
+- Exportacion CSV.
+- Impresion / PDF.
 
-REGLA
------
-Quiebre real = transición de saldo positivo a $0.00.
-El tiempo se calcula desde la toma donde se observa $0.00 hasta la
-toma donde se observa recuperación, limitado al mes solicitado.
-
-Los clientes que siempre han estado en $0.00 y nunca registraron saldo
-positivo NO se mezclan con este informe; siguen tratados como BAJAS.
+Por defecto, el 1 de septiembre de 2026 seleccionara agosto 2026.
