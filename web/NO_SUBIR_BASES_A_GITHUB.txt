@@ -1,0 +1,18 @@
+IMPORTANTE - NO SUBIR LAS BASES DE CLIENTES A GITHUB / VERCEL
+================================================================
+
+Los archivos:
+- clientes_epin_para_importar.csv
+- RPOINTS_*.csv
+
+contienen informacion de clientes.
+
+Usalos solamente desde tu PC para cargarlos en:
+Configuracion > Datos maestros.
+
+NO los copies dentro de la carpeta web.
+NO los agregues al repositorio GitHub.
+
+El navegador los procesa localmente y envia a Supabase solo los campos
+necesarios para la relacion:
+EPIN, ID DMS, cliente, circuito, departamento, ciudad y estado DMS.

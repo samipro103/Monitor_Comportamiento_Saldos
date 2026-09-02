@@ -1,38 +1,167 @@
-MONITOR DE SALDOS — DISEÑO v2.6
-=================================
+MONITOR DE SALDOS - RUTAS / CIRCUITOS / ID DMS + CSV COMPLETO
+=================================================================
 
-CAMBIOS
--------
-- Fuente general más grande.
-- Títulos más legibles.
-- KPIs más fáciles de leer.
-- Navegación lateral más cómoda.
-- Botones y filtros más grandes.
-- Tablas con texto más claro.
-- Histórico profundo más legible.
-- Login más amigable.
-- Responsive mejorado para teléfono y tablet.
-- Las tablas conservan todas sus columnas y en móvil se deslizan horizontalmente.
+ESTE PARCHE HACE 4 COSAS
+------------------------
+1. Relaciona Telefono EPIN -> ID DMS.
+2. Relaciona Circuito -> Ruta -> Territorio.
+3. Agrega filtros Territorio / Ruta / Circuito al Informe de quiebre.
+4. Corrige la exportacion:
+   - CSV completo = TODOS los casos del mes.
+   - CSV filtrado = solo lo que estes viendo con los filtros.
 
-NO CAMBIA
----------
-- Posiciones/secciones.
-- app.js.
-- config.json.
-- index.html.
-- Supabase.
-- SQL.
-- Login.
-- Datos.
-- Clasificaciones.
-- Histórico.
-- Filtros.
-- Proyecto/link de Vercel.
+REGLA DE QUIEBRE
+----------------
+Saldo <= $4.99 = EN QUIEBRE.
+Saldo >= $5.00 = FUERA DE QUIEBRE.
 
-PARA APLICAR
-------------
-1. Extrae TODO el ZIP.
-2. Ejecuta ACTUALIZAR_DISENO_Y_PUBLICAR.bat.
-3. Espera a que Vercel termine.
-4. En PC: abre el mismo link y presiona Ctrl+F5.
-5. En teléfono: cierra la página y vuelve a abrirla.
+PASO 1 - SUPABASE
+-----------------
+En Supabase > SQL Editor > New query:
+abre y ejecuta TODO:
+
+  07_MAESTROS_RUTAS_Y_QUIEBRE.sql
+
+Debe terminar sin error.
+
+Este SQL NO borra el historico de saldos.
+Crea tablas maestras separadas y reemplaza la funcion del informe.
+
+PASO 2 - CARPETA WEB
+--------------------
+Copia estos 2 archivos dentro de:
+
+  C:\Users\SAMUEL\Desktop\Monitor_Comportamiento_Saldos\web
+
+Archivos:
+  quiebre-report.js
+  master-data-import.js
+
+Si quiebre-report.js ya existe, reemplazalo.
+
+NO COPIES los CSV de clientes a la carpeta web.
+Contienen datos de clientes y deben quedar fuera de GitHub/Vercel.
+
+PASO 3 - INDEX.HTML
+-------------------
+Al final de web\index.html debe quedar:
+
+  <script src="./app.js?v=24"></script>
+  <script src="./quiebre-report.js?v=3"></script>
+  <script src="./master-data-import.js?v=1"></script>
+
+El v=3 evita que el navegador conserve la version anterior del informe.
+
+PASO 4 - PUBLICAR VERCEL
+------------------------
+Ejecuta:
+
+  web\PUBLICAR_MISMO_PROYECTO.bat
+
+Cuando termine, abre la web y haz Ctrl + F5.
+
+PASO 5 - CARGAR DATOS MAESTROS
+------------------------------
+En la misma web entra a:
+
+  Configuracion
+
+Abajo aparecera:
+
+  DATOS MAESTROS
+  Ruta, circuito y relacion EPIN / DMS
+
+Carga primero:
+
+  clientes_epin_para_importar.csv
+
+y pulsa:
+  Importar clientes
+
+Espera a que llegue a 100%.
+
+Luego carga:
+
+  circuitos_rutas_para_importar.csv
+
+y pulsa:
+  Importar circuitos
+
+Espera a que termine.
+
+Los dos CSV limpios vienen dentro de este ZIP.
+La pantalla tambien acepta tus CSV originales si quieres actualizarlos
+en el futuro.
+
+RESULTADO ESPERADO
+------------------
+El Informe de quiebre ahora mostrara:
+
+  Nivel
+  ID DMS
+  ID Monitor
+  Telefono EPIN
+  Cliente
+  Territorio
+  Ruta
+  Circuito
+  Departamento
+  Ciudad
+  Estado DMS
+  Saldo al cierre
+  Entradas a quiebre
+  Quiebre acumulado
+  Mayor quiebre continuo
+  Estado al cierre
+
+Tambien tendras filtros:
+  Territorio -> Ruta -> Circuito
+
+EXPORTACION
+-----------
+CSV completo:
+  descarga TODOS los clientes con quiebre del mes aunque tengas filtros.
+
+CSV filtrado:
+  descarga solo el resultado que tengas visible.
+
+CASO DE CONTROL
+---------------
+EPIN:       75598167
+ID DMS:     235627
+Cliente:    TIENDA CANDELARIA
+Circuito:   SCCW15
+Ruta:       RUTA #6 USULUTAN
+Territorio: Usulutan
+
+Si ese caso sale asi, la relacion esta funcionando.
+
+NO HAY QUE REINICIAR
+--------------------
+No reinicies:
+- agente
+- PC
+- Supabase
+
+Solo hay que publicar Vercel y cargar los maestros una vez.
+
+
+NOTA SOBRE COBERTURA DE RUTAS
+-----------------------------
+La base de clientes trae 182 circuitos distintos con EPIN.
+El archivo circuitos(3).csv trae 101 circuitos con ruta.
+
+Con los archivos recibidos:
+- 10,762 relaciones EPIN -> DMS fueron preparadas.
+- 9,125 tienen una ruta encontrada en circuitos(3).csv.
+- 1,637 EPIN pertenecen a circuitos que no aparecen en ese archivo.
+
+Esto NO elimina esos clientes del informe:
+- ID DMS y Circuito siguen apareciendo.
+- Ruta queda vacia cuando el circuito no existe en el archivo de rutas.
+
+Se incluye:
+  circuitos_sin_ruta_en_archivo.csv
+
+para que puedas revisar los 81 circuitos faltantes si luego quieres
+completar la cobertura de rutas al 100%.

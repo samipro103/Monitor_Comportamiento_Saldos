@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="es">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -9,417 +8,136 @@
   <meta name="monitor-version" content="SUPABASE-V2.4" />
   <link rel="stylesheet" href="./styles.css?v=28" />
 </head>
-
 <body>
 
-  <section id="authScreen" class="auth-screen">
-    <div class="auth-panel">
-      <div class="auth-intro">
-        <div class="brand-mark">CS</div>
-        <span class="eyebrow">MONITOREO CENTRALIZADO</span>
-        <h1>Control de Saldos</h1>
-        <p>Histórico profundo de teléfonos e IDs EPIN. Los datos se consultan directamente desde la base central y
-          permanecen disponibles para todos los usuarios autorizados.</p>
-      </div>
-      <form id="loginForm" class="auth-form">
-        <span class="eyebrow">ACCESO AL SISTEMA</span>
-        <h2>Iniciar sesión</h2>
-        <p>Usa el usuario creado en Supabase Authentication.</p>
-        <label for="loginEmail">Correo</label>
-        <input id="loginEmail" type="email" autocomplete="username" required />
-        <label for="loginPassword">Contraseña</label>
-        <input id="loginPassword" type="password" autocomplete="current-password" required />
-        <button id="loginBtn" class="btn primary" type="submit">Ingresar</button>
-        <div id="loginError" class="auth-error"></div>
-      </form>
+<section id="authScreen" class="auth-screen">
+  <div class="auth-panel">
+    <div class="auth-intro">
+      <div class="brand-mark">CS</div>
+      <span class="eyebrow">MONITOREO CENTRALIZADO</span>
+      <h1>Control de Saldos</h1>
+      <p>Histórico profundo de teléfonos e IDs EPIN. Los datos se consultan directamente desde la base central y permanecen disponibles para todos los usuarios autorizados.</p>
     </div>
-  </section>
-
-  <div id="appShell" class="shell hidden">
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-mark">CS</div>
-        <div><strong>Control de Saldos</strong><span>Histórico EPIN</span></div>
-      </div>
-      <nav>
-        <button class="nav-item active" data-view="overview">Resumen</button>
-        <button class="nav-item" data-view="attention">Atención</button>
-        <button class="nav-item" data-view="bajas">Bajas</button>
-        <button class="nav-item" data-view="explorer">Explorador</button>
-        <button class="nav-item" data-view="settings">Configuración</button>
-      </nav>
-      <div class="side-foot"><span id="sideDot" class="dot"></span>
-        <div><b id="sideStatus">Conectando</b><small id="sideLast">Supabase central</small></div>
-      </div>
-    </aside>
-
-    <div class="workspace">
-      <header class="topbar">
-        <div><span class="eyebrow">MONITOREO OPERATIVO</span>
-          <h1 id="pageTitle">Resumen</h1>
-        </div>
-        <div class="top-actions">
-          <div class="sync"><b id="headerStatus">Consultando Supabase</b><small id="headerMeta">Sin histórico</small>
-          </div><button id="scanBtn" class="btn primary">Actualizar vista</button>
-        </div>
-      </header>
-
-      <main>
-        <section id="view-overview" class="view active">
-          <div class="intro">
-            <div><span class="eyebrow">LECTURA DEL HISTÓRICO</span>
-              <h2>Qué está pasando con los teléfonos e IDs</h2>
-              <p id="periodText">Cargando período disponible…</p>
-            </div>
-            <div class="snapshot"><span>Tomas</span><b id="snapshotCount">0</b></div>
-          </div>
-
-          <div class="kpis">
-            <div class="kpi"><span>IDs / teléfonos</span><b id="clientsCount">0</b><small id="obsText">0
-                observaciones</small></div>
-            <div class="kpi attention"><span>Con movimiento</span><b id="attentionCount">0</b><small>Van a
-                Atención</small></div>
-            <div class="kpi baja"><span>Bajas confirmadas</span><b id="bajasCount">0</b><small>Siempre $0.00</small>
-            </div>
-            <div class="kpi urgent"><span>Urgentes</span><b id="urgentCount">0</b><small>Con movimiento y alerta
-                alta</small></div>
-            <div class="kpi"><span>En quiebre ahora</span><b id="quiebreCount">0</b><small>Solo casos con
-                movimiento</small></div>
-            <div class="kpi"><span>Por confirmar</span><b id="pendingCount">0</b><small>Falta histórico</small></div>
-          </div>
-          <div class="split">
-            <section>
-              <div class="section-head">
-                <div><span class="eyebrow">PRIORIDAD</span>
-                  <h2>Atención inmediata</h2>
-                  <p>Casos con movimiento que necesitan revisión primero.</p>
-                </div><button class="link-btn" data-goto="attention">Ver todos →</button>
-              </div>
-              <div class="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Prioridad</th>
-                      <th>ID</th>
-                      <th>Teléfono</th>
-                      <th>Comercio</th>
-                      <th class="num">Saldo</th>
-                      <th class="num">Cambios</th>
-                      <th class="num">Quiebres</th>
-                      <th>Diagnóstico</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody id="overviewAttentionRows"></tbody>
-                </table>
-              </div>
-              <div id="overviewAttentionEmpty" class="empty hidden">No hay casos de atención todavía.</div>
-            </section>
-
-            <aside class="facts">
-              <span class="eyebrow">LECTURA RÁPIDA</span>
-              <h3>Comportamiento actual</h3>
-              <dl>
-                <div>
-                  <dt>En $0 con movimiento previo</dt>
-                  <dd id="zeroMovingCount">0</dd>
-                </div>
-                <div>
-                  <dt>Reincidentes</dt>
-                  <dd id="recurrentCount">0</dd>
-                </div>
-                <div>
-                  <dt>Recuperados</dt>
-                  <dd id="recoveredCount">0</dd>
-                </div>
-                <div>
-                  <dt>Último movimiento: caída</dt>
-                  <dd id="fallingCount">0</dd>
-                </div>
-                <div>
-                  <dt>Último movimiento: recarga</dt>
-                  <dd id="rechargingCount">0</dd>
-                </div>
-                <div>
-                  <dt>Sin movimiento positivo</dt>
-                  <dd id="noMovementCount">0</dd>
-                </div>
-              </dl>
-            </aside>
-          </div>
-
-          <section class="bajas-preview">
-            <div class="section-head">
-              <div><span class="eyebrow">DEPURACIÓN</span>
-                <h2>Bajas confirmadas</h2>
-                <p>Estas no se mezclan con Atención porque nunca han tenido saldo positivo dentro del histórico cargado.
-                </p>
-              </div><button class="link-btn" data-goto="bajas">Abrir bajas →</button>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Teléfono</th>
-                    <th>Comercio</th>
-                    <th class="num">Tomas</th>
-                    <th>Primera toma</th>
-                    <th>Última toma</th>
-                    <th>Motivo</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody id="overviewBajasRows"></tbody>
-              </table>
-            </div>
-            <div id="overviewBajasEmpty" class="empty hidden">Todavía no hay bajas confirmadas.</div>
-          </section>
-        </section>
-
-        <section id="view-attention" class="view">
-          <div class="section-head">
-            <div><span class="eyebrow">CON MOVIMIENTO</span>
-              <h2>Atención</h2>
-              <p>Todo ID/teléfono que haya cambiado de saldo aparece aquí. Las bajas quedan fuera.</p>
-            </div>
-            <div id="attentionResultCount" class="count">0 resultados</div>
-          </div>
-          <div class="filters"><input id="attentionSearch" type="search"
-              placeholder="Buscar ID, teléfono o comercio"><select id="attentionCondition">
-              <option value="">Todos los movimientos</option>
-              <option value="quiebre">En quiebre ahora</option>
-              <option value="reincidente">Reincidentes</option>
-              <option value="cayendo">Último movimiento: caída</option>
-              <option value="recargando">Último movimiento: recarga</option>
-              <option value="recuperado">Recuperados</option>
-            </select><select id="attentionSort">
-              <option value="priority_score">Mayor prioridad</option>
-              <option value="current_balance">Saldo actual más bajo</option>
-              <option value="stockout_events">Más quiebres</option>
-              <option value="changes_count">Más cambios</option>
-              <option value="total_movement">Mayor movimiento $</option>
-              <option value="last_movement_ts">Movimiento más reciente</option>
-            </select></div>
-          <div class="table-wrap tall">
-            <table>
-              <thead>
-                <tr>
-                  <th>Prioridad</th>
-                  <th>ID</th>
-                  <th>Teléfono</th>
-                  <th>Comercio</th>
-                  <th class="num">Saldo actual</th>
-                  <th class="num">Cambios</th>
-                  <th class="num">Mov. $</th>
-                  <th class="num">Quiebres</th>
-                  <th>Último movimiento</th>
-                  <th>Diagnóstico</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="attentionRows"></tbody>
-            </table>
-          </div>
-          <div id="attentionEmpty" class="empty hidden">No hay resultados.</div>
-        </section>
-
-        <section id="view-bajas" class="view">
-          <div class="section-head">
-            <div><span class="eyebrow">SIEMPRE $0.00</span>
-              <h2>Bajas</h2>
-              <p>Solo se confirma una baja cuando alcanza el mínimo de tomas configurado y todas están en $0.00.</p>
-            </div>
-            <div id="bajasResultCount" class="count">0 bajas</div>
-          </div>
-          <div class="filters two"><input id="bajasSearch" type="search"
-              placeholder="Buscar ID, teléfono o comercio"><select id="bajasSort">
-              <option value="observations">Más histórico</option>
-              <option value="last_ts">Última toma</option>
-            </select></div>
-          <div class="table-wrap tall">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Teléfono</th>
-                  <th>Comercio</th>
-                  <th class="num">Tomas en $0</th>
-                  <th class="num">Saldo máximo</th>
-                  <th>Desde</th>
-                  <th>Hasta</th>
-                  <th>Diagnóstico</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="bajasRows"></tbody>
-            </table>
-          </div>
-          <div id="bajasEmpty" class="empty hidden">No hay bajas confirmadas.</div>
-        </section>
-
-        <section id="view-explorer" class="view">
-          <div class="section-head">
-            <div><span class="eyebrow">TODOS LOS REGISTROS</span>
-              <h2>Explorador</h2>
-              <p>Consulta cualquier ID o teléfono, incluyendo atención, bajas, sin movimiento y pendientes.</p>
-            </div>
-            <div id="explorerResultCount" class="count">0 resultados</div>
-          </div>
-          <div class="filters"><input id="explorerSearch" type="search"
-              placeholder="Buscar ID, teléfono, comercio o nombre"><select id="classFilter">
-              <option value="">Todas las clasificaciones</option>
-              <option value="ATENCION URGENTE">Atención urgente</option>
-              <option value="ATENCION">Atención</option>
-              <option value="REACTIVADO">Reactivado</option>
-              <option value="CON MOVIMIENTO">Con movimiento</option>
-              <option value="BAJA">Baja</option>
-              <option value="SIN MOVIMIENTO">Sin movimiento</option>
-              <option value="POR CONFIRMAR">Por confirmar</option>
-            </select><select id="explorerSort">
-              <option value="priority_score">Mayor prioridad</option>
-              <option value="observations">Más histórico</option>
-              <option value="current_balance">Saldo actual</option>
-              <option value="changes_count">Más cambios</option>
-            </select></div>
-          <div class="table-wrap tall">
-            <table>
-              <thead>
-                <tr>
-                  <th>Clasificación</th>
-                  <th>ID</th>
-                  <th>Teléfono</th>
-                  <th>Comercio</th>
-                  <th class="num">Saldo</th>
-                  <th class="num">Tomas</th>
-                  <th class="num">Cambios</th>
-                  <th class="num">% en $0</th>
-                  <th>Diagnóstico</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="explorerRows"></tbody>
-            </table>
-          </div>
-          <div id="explorerEmpty" class="empty hidden">No hay resultados.</div>
-        </section>
-
-        <section id="view-settings" class="view">
-          <div class="section-head">
-            <div><span class="eyebrow">CONFIGURACIÓN CENTRAL</span>
-              <h2>Fuente, reglas y conexión</h2>
-              <p>La web ya no procesa archivos. Lee directamente la información consolidada en Supabase.</p>
-            </div><span class="connection-pill">Conexión central</span>
-          </div>
-          <div class="cloud-settings">
-            <div class="cloud-row">
-              <div><b>Fuente de datos</b>
-                <p>Carpeta que vigila el agente Windows.</p>
-              </div>
-              <div id="cfgSource" class="cloud-value">—</div>
-            </div>
-            <div class="cloud-row">
-              <div><b>Última actualización</b>
-                <p>Último reporte recibido por la base central.</p>
-              </div>
-              <div id="cfgLastUpload" class="cloud-value">—</div>
-            </div>
-            <div class="cloud-row">
-              <div><b>Agente</b>
-                <p>Computadora que mantiene el histórico actualizado.</p>
-              </div>
-              <div id="cfgAgent" class="cloud-value">—</div>
-            </div>
-            <div class="cloud-row">
-              <div><b>Reglas</b>
-                <p>Umbrales activos utilizados por la clasificación.</p>
-              </div>
-              <div id="cfgRules" class="cloud-value">—</div>
-            </div>
-            <div class="cloud-row">
-              <div><b>Sesión</b>
-                <p>Usuario que está consultando la información.</p>
-              </div>
-              <div id="cfgUser" class="cloud-value">—</div>
-            </div>
-          </div>
-          <div class="account-actions"><button id="logoutBtn" class="btn ghost danger-text">Cerrar sesión</button></div>
-        </section>
-      </main>
-    </div>
+    <form id="loginForm" class="auth-form">
+      <span class="eyebrow">ACCESO AL SISTEMA</span>
+      <h2>Iniciar sesión</h2>
+      <p>Usa el usuario creado en Supabase Authentication.</p>
+      <label for="loginEmail">Correo</label>
+      <input id="loginEmail" type="email" autocomplete="username" required />
+      <label for="loginPassword">Contraseña</label>
+      <input id="loginPassword" type="password" autocomplete="current-password" required />
+      <button id="loginBtn" class="btn primary" type="submit">Ingresar</button>
+      <div id="loginError" class="auth-error"></div>
+    </form>
   </div>
+</section>
 
-  <div id="drawerOverlay" class="overlay hidden"></div>
-  <aside id="drawer" class="drawer hidden">
-    <header class="drawer-head">
-      <div><span id="detailClass" class="badge">—</span>
-        <h2 id="detailName">Historial</h2>
-        <p id="detailMeta">—</p>
-      </div><button id="closeDetailBtn" class="close">×</button>
-    </header>
-    <div id="detailDiagnosis" class="diagnosis"></div>
-    <div id="detailStats" class="detail-stats"></div>
-    <section class="history-section">
-      <div class="history-head">
-        <div>
-          <h3>Evolución del saldo</h3><span id="chartRange">—</span>
-        </div>
-        <div class="range-buttons"><button data-range="all" class="range active">Todo</button><button data-range="24h"
-            class="range">24 h</button><button data-range="7d" class="range">7 días</button><button data-range="30d"
-            class="range">30 días</button></div>
-      </div>
-      <div id="chart" class="chart"></div>
-    </section>
-    <section class="history-section">
-      <div class="history-head">
-        <div>
-          <h3>Resumen diario</h3><span>Cómo abrió, cayó, subió y cerró cada día.</span>
-        </div>
-      </div>
-      <div class="table-wrap drawer-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th class="num">Inicio</th>
-              <th class="num">Mín.</th>
-              <th class="num">Máx.</th>
-              <th class="num">Cierre</th>
-              <th class="num">Cambios</th>
-              <th class="num">Consumo</th>
-              <th class="num">Recargas</th>
-            </tr>
-          </thead>
-          <tbody id="dailyRows"></tbody>
-        </table>
-      </div>
-    </section>
-    <section class="history-section">
-      <div class="history-head">
-        <div>
-          <h3>Movimientos del histórico</h3><span id="eventsCount">0 movimientos</span>
-        </div><button id="exportBtn" class="btn secondary small">Exportar CSV</button>
-      </div>
-      <div class="table-wrap drawer-table events">
-        <table>
-          <thead>
-            <tr>
-              <th>Fecha y hora</th>
-              <th class="num">Saldo</th>
-              <th class="num">Variación</th>
-              <th>Evento</th>
-            </tr>
-          </thead>
-          <tbody id="eventRows"></tbody>
-        </table>
-      </div>
-    </section>
+<div id="appShell" class="shell hidden">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">CS</div><div><strong>Control de Saldos</strong><span>Histórico EPIN</span></div></div>
+    <nav>
+      <button class="nav-item active" data-view="overview">Resumen</button>
+      <button class="nav-item" data-view="attention">Atención</button>
+      <button class="nav-item" data-view="bajas">Bajas</button>
+      <button class="nav-item" data-view="explorer">Explorador</button>
+      <button class="nav-item" data-view="settings">Configuración</button>
+    </nav>
+    <div class="side-foot"><span id="sideDot" class="dot"></span><div><b id="sideStatus">Conectando</b><small id="sideLast">Supabase central</small></div></div>
   </aside>
 
-  <div id="toast" class="toast hidden"></div>
-  <script src="./app.js?v=24"></script>
-  <script src="./quiebre-report.js?v=3"></script>
-  <script src="./master-data-import.js?v=1"></script>
-</body>
+  <div class="workspace">
+    <header class="topbar">
+      <div><span class="eyebrow">MONITOREO OPERATIVO</span><h1 id="pageTitle">Resumen</h1></div>
+      <div class="top-actions"><div class="sync"><b id="headerStatus">Consultando Supabase</b><small id="headerMeta">Sin histórico</small></div><button id="scanBtn" class="btn primary">Actualizar vista</button></div>
+    </header>
 
+    <main>
+      <section id="view-overview" class="view active">
+        <div class="intro"><div><span class="eyebrow">LECTURA DEL HISTÓRICO</span><h2>Qué está pasando con los teléfonos e IDs</h2><p id="periodText">Cargando período disponible…</p></div><div class="snapshot"><span>Tomas</span><b id="snapshotCount">0</b></div></div>
+
+        <div class="kpis">
+          <div class="kpi"><span>IDs / teléfonos</span><b id="clientsCount">0</b><small id="obsText">0 observaciones</small></div>
+          <div class="kpi attention"><span>Con movimiento</span><b id="attentionCount">0</b><small>Van a Atención</small></div>
+          <div class="kpi baja"><span>Bajas confirmadas</span><b id="bajasCount">0</b><small>Siempre $0.00</small></div>
+          <div class="kpi urgent"><span>Urgentes</span><b id="urgentCount">0</b><small>Con movimiento y alerta alta</small></div>
+          <div class="kpi"><span>En quiebre ahora</span><b id="quiebreCount">0</b><small>Solo casos con movimiento</small></div>
+          <div class="kpi"><span>Por confirmar</span><b id="pendingCount">0</b><small>Falta histórico</small></div>
+        </div>
+<div class="split">
+          <section>
+            <div class="section-head"><div><span class="eyebrow">PRIORIDAD</span><h2>Atención inmediata</h2><p>Casos con movimiento que necesitan revisión primero.</p></div><button class="link-btn" data-goto="attention">Ver todos →</button></div>
+            <div class="table-wrap"><table><thead><tr><th>Prioridad</th><th>ID</th><th>Teléfono</th><th>Comercio</th><th class="num">Saldo</th><th class="num">Cambios</th><th class="num">Quiebres</th><th>Diagnóstico</th><th></th></tr></thead><tbody id="overviewAttentionRows"></tbody></table></div>
+            <div id="overviewAttentionEmpty" class="empty hidden">No hay casos de atención todavía.</div>
+          </section>
+
+          <aside class="facts">
+            <span class="eyebrow">LECTURA RÁPIDA</span>
+            <h3>Comportamiento actual</h3>
+            <dl>
+              <div><dt>En $0 con movimiento previo</dt><dd id="zeroMovingCount">0</dd></div>
+              <div><dt>Reincidentes</dt><dd id="recurrentCount">0</dd></div>
+              <div><dt>Recuperados</dt><dd id="recoveredCount">0</dd></div>
+              <div><dt>Último movimiento: caída</dt><dd id="fallingCount">0</dd></div>
+              <div><dt>Último movimiento: recarga</dt><dd id="rechargingCount">0</dd></div>
+              <div><dt>Sin movimiento positivo</dt><dd id="noMovementCount">0</dd></div>
+            </dl>
+          </aside>
+        </div>
+
+        <section class="bajas-preview">
+          <div class="section-head"><div><span class="eyebrow">DEPURACIÓN</span><h2>Bajas confirmadas</h2><p>Estas no se mezclan con Atención porque nunca han tenido saldo positivo dentro del histórico cargado.</p></div><button class="link-btn" data-goto="bajas">Abrir bajas →</button></div>
+          <div class="table-wrap"><table><thead><tr><th>ID</th><th>Teléfono</th><th>Comercio</th><th class="num">Tomas</th><th>Primera toma</th><th>Última toma</th><th>Motivo</th><th></th></tr></thead><tbody id="overviewBajasRows"></tbody></table></div>
+          <div id="overviewBajasEmpty" class="empty hidden">Todavía no hay bajas confirmadas.</div>
+        </section>
+      </section>
+
+      <section id="view-attention" class="view">
+        <div class="section-head"><div><span class="eyebrow">CON MOVIMIENTO</span><h2>Atención</h2><p>Todo ID/teléfono que haya cambiado de saldo aparece aquí. Las bajas quedan fuera.</p></div><div id="attentionResultCount" class="count">0 resultados</div></div>
+        <div class="filters"><input id="attentionSearch" type="search" placeholder="Buscar ID, teléfono o comercio"><select id="attentionCondition"><option value="">Todos los movimientos</option><option value="quiebre">En quiebre ahora</option><option value="reincidente">Reincidentes</option><option value="cayendo">Último movimiento: caída</option><option value="recargando">Último movimiento: recarga</option><option value="recuperado">Recuperados</option></select><select id="attentionSort"><option value="priority_score">Mayor prioridad</option><option value="current_balance">Saldo actual más bajo</option><option value="stockout_events">Más quiebres</option><option value="changes_count">Más cambios</option><option value="total_movement">Mayor movimiento $</option><option value="last_movement_ts">Movimiento más reciente</option></select></div>
+        <div class="table-wrap tall"><table><thead><tr><th>Prioridad</th><th>ID</th><th>Teléfono</th><th>Comercio</th><th class="num">Saldo actual</th><th class="num">Cambios</th><th class="num">Mov. $</th><th class="num">Quiebres</th><th>Último movimiento</th><th>Diagnóstico</th><th></th></tr></thead><tbody id="attentionRows"></tbody></table></div>
+        <div id="attentionEmpty" class="empty hidden">No hay resultados.</div>
+      </section>
+
+      <section id="view-bajas" class="view">
+        <div class="section-head"><div><span class="eyebrow">SIEMPRE $0.00</span><h2>Bajas</h2><p>Solo se confirma una baja cuando alcanza el mínimo de tomas configurado y todas están en $0.00.</p></div><div id="bajasResultCount" class="count">0 bajas</div></div>
+        <div class="filters two"><input id="bajasSearch" type="search" placeholder="Buscar ID, teléfono o comercio"><select id="bajasSort"><option value="observations">Más histórico</option><option value="last_ts">Última toma</option></select></div>
+        <div class="table-wrap tall"><table><thead><tr><th>ID</th><th>Teléfono</th><th>Comercio</th><th class="num">Tomas en $0</th><th class="num">Saldo máximo</th><th>Desde</th><th>Hasta</th><th>Diagnóstico</th><th></th></tr></thead><tbody id="bajasRows"></tbody></table></div>
+        <div id="bajasEmpty" class="empty hidden">No hay bajas confirmadas.</div>
+      </section>
+
+      <section id="view-explorer" class="view">
+        <div class="section-head"><div><span class="eyebrow">TODOS LOS REGISTROS</span><h2>Explorador</h2><p>Consulta cualquier ID o teléfono, incluyendo atención, bajas, sin movimiento y pendientes.</p></div><div id="explorerResultCount" class="count">0 resultados</div></div>
+        <div class="filters"><input id="explorerSearch" type="search" placeholder="Buscar ID, teléfono, comercio o nombre"><select id="classFilter"><option value="">Todas las clasificaciones</option><option value="ATENCION URGENTE">Atención urgente</option><option value="ATENCION">Atención</option><option value="REACTIVADO">Reactivado</option><option value="CON MOVIMIENTO">Con movimiento</option><option value="BAJA">Baja</option><option value="SIN MOVIMIENTO">Sin movimiento</option><option value="POR CONFIRMAR">Por confirmar</option></select><select id="explorerSort"><option value="priority_score">Mayor prioridad</option><option value="observations">Más histórico</option><option value="current_balance">Saldo actual</option><option value="changes_count">Más cambios</option></select></div>
+        <div class="table-wrap tall"><table><thead><tr><th>Clasificación</th><th>ID</th><th>Teléfono</th><th>Comercio</th><th class="num">Saldo</th><th class="num">Tomas</th><th class="num">Cambios</th><th class="num">% en $0</th><th>Diagnóstico</th><th></th></tr></thead><tbody id="explorerRows"></tbody></table></div>
+        <div id="explorerEmpty" class="empty hidden">No hay resultados.</div>
+      </section>
+
+      <section id="view-settings" class="view">
+        <div class="section-head"><div><span class="eyebrow">CONFIGURACIÓN CENTRAL</span><h2>Fuente, reglas y conexión</h2><p>La web ya no procesa archivos. Lee directamente la información consolidada en Supabase.</p></div><span class="connection-pill">Conexión central</span></div>
+        <div class="cloud-settings">
+          <div class="cloud-row"><div><b>Fuente de datos</b><p>Carpeta que vigila el agente Windows.</p></div><div id="cfgSource" class="cloud-value">—</div></div>
+          <div class="cloud-row"><div><b>Última actualización</b><p>Último reporte recibido por la base central.</p></div><div id="cfgLastUpload" class="cloud-value">—</div></div>
+          <div class="cloud-row"><div><b>Agente</b><p>Computadora que mantiene el histórico actualizado.</p></div><div id="cfgAgent" class="cloud-value">—</div></div>
+          <div class="cloud-row"><div><b>Reglas</b><p>Umbrales activos utilizados por la clasificación.</p></div><div id="cfgRules" class="cloud-value">—</div></div>
+          <div class="cloud-row"><div><b>Sesión</b><p>Usuario que está consultando la información.</p></div><div id="cfgUser" class="cloud-value">—</div></div>
+        </div>
+        <div class="account-actions"><button id="logoutBtn" class="btn ghost danger-text">Cerrar sesión</button></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div id="drawerOverlay" class="overlay hidden"></div>
+<aside id="drawer" class="drawer hidden">
+  <header class="drawer-head"><div><span id="detailClass" class="badge">—</span><h2 id="detailName">Historial</h2><p id="detailMeta">—</p></div><button id="closeDetailBtn" class="close">×</button></header>
+  <div id="detailDiagnosis" class="diagnosis"></div>
+  <div id="detailStats" class="detail-stats"></div>
+  <section class="history-section"><div class="history-head"><div><h3>Evolución del saldo</h3><span id="chartRange">—</span></div><div class="range-buttons"><button data-range="all" class="range active">Todo</button><button data-range="24h" class="range">24 h</button><button data-range="7d" class="range">7 días</button><button data-range="30d" class="range">30 días</button></div></div><div id="chart" class="chart"></div></section>
+  <section class="history-section"><div class="history-head"><div><h3>Resumen diario</h3><span>Cómo abrió, cayó, subió y cerró cada día.</span></div></div><div class="table-wrap drawer-table"><table><thead><tr><th>Fecha</th><th class="num">Inicio</th><th class="num">Mín.</th><th class="num">Máx.</th><th class="num">Cierre</th><th class="num">Cambios</th><th class="num">Consumo</th><th class="num">Recargas</th></tr></thead><tbody id="dailyRows"></tbody></table></div></section>
+  <section class="history-section"><div class="history-head"><div><h3>Movimientos del histórico</h3><span id="eventsCount">0 movimientos</span></div><button id="exportBtn" class="btn secondary small">Exportar CSV</button></div><div class="table-wrap drawer-table events"><table><thead><tr><th>Fecha y hora</th><th class="num">Saldo</th><th class="num">Variación</th><th>Evento</th></tr></thead><tbody id="eventRows"></tbody></table></div></section>
+</aside>
+
+<div id="toast" class="toast hidden"></div>
+<script src="./app.js?v=24"></script>
+</body>
 </html>
