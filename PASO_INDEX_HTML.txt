@@ -1,0 +1,23 @@
+CAMBIO EN web/index.html
+========================
+
+NO borres ningún script que ya tengas.
+
+Al final de index.html, justo antes de:
+
+</body>
+
+agrega esta línea:
+
+<script src="./sales-circuit-report.js?v=1"></script>
+
+Si ya instalaste el parche anterior de Seguimiento, tu final puede verse parecido a:
+
+<script src="./app.js?v=25"></script>
+<script src="./quiebre-report.js?v=4"></script>
+<script src="./master-data-import.js?v=1"></script>
+<script src="./operativo-v2.js?v=1"></script>
+<script src="./sales-circuit-report.js?v=1"></script>
+
+Lo importante es AGREGAR sales-circuit-report.js.
+No importa si las versiones de tus otros scripts son diferentes.

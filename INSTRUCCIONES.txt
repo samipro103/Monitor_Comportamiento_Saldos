@@ -1,79 +1,180 @@
-PARCHE CORREGIDO - INFORME DE QUIEBRE ACUMULADO <= $4.99
-===========================================================
+INFORME DE VENTAS POR CIRCUITO - V1
+===================================
 
-REGLA DEFINITIVA
-----------------
-QUIEBRE = saldo desde $0.00 hasta $4.99 inclusive.
+QUÉ HACE
+--------
+Crea una nueva pantalla en el Monitor de Saldos:
 
-El quiebre comienza cuando el cliente entra a $4.99 o menos.
-El quiebre termina cuando vuelve a $5.00 o mas.
+    Ventas por circuito
+
+Solo toma clientes cuyo Estado DMS actual sea:
+
+    VENDE
+
+La venta observada se toma de la métrica consumption que el monitor
+ya calcula cuando el balance disminuye.
 
 Ejemplo:
-  10:00  $8.00   -> fuera de quiebre
-  14:00  $4.50   -> comienza quiebre
-  18:00  $3.00   -> sigue en el MISMO quiebre
-  08:00  $1.00   -> sigue en el MISMO quiebre
-  11:00  $7.00   -> termina quiebre
+    saldo anterior = $20
+    saldo nuevo    = $14
+    venta observada = $6
 
-El tiempo acumulado seria desde las 14:00 hasta las 11:00 del dia
-siguiente. Los cambios dentro de $0.00-$4.99 NO crean quiebres nuevos.
+No modifica la ingesta ni borra histórico.
 
-1) SUPABASE
------------
-Abre Supabase > SQL Editor > New query.
-Copia TODO el contenido de:
+ORDEN EXACTO
+------------
 
-  06_INFORME_QUIEBRE_MENSUAL.sql
+1. RESPALDO
 
-y pulsa Run.
+Guarda una copia de:
 
-IMPORTANTE:
-Si ya habias ejecutado la version anterior que usaba $0.00,
-NO PASA NADA. Ejecuta este SQL corregido y reemplazara la funcion
-anterior con la regla <= $4.99.
+    web/index.html
 
-No borra el historico ni modifica el agente.
+No necesitas cambiar app.js.
 
-2) WEB
-------
+2. SUPABASE
+
+Entra a:
+
+    Supabase
+    SQL Editor
+    New query
+
+Abre:
+
+    09_INFORME_VENTAS_CIRCUITO.sql
+
+Copia TODO y presiona RUN.
+
+Debe terminar sin error.
+
+Este script requiere que ya esté instalado:
+
+    07_MAESTROS_RUTAS_Y_QUIEBRE.sql
+
+porque usa:
+    monitor_client_master
+    monitor_circuit_master
+
+3. WEB
+
 Copia:
-  quiebre-report.js
+
+    sales-circuit-report.js
 
 dentro de:
-  web\
 
-Si ya existe una version anterior, REEMPLAZALA.
+    web\
 
-3) INDEX.HTML
--------------
-Al final de web\index.html debe quedar:
+Debe quedar:
 
-  <script src="./app.js?v=24"></script>
-  <script src="./quiebre-report.js?v=2"></script>
+    web\sales-circuit-report.js
 
-Si habias puesto ?v=1, cambialo por ?v=2 para evitar cache.
+4. INDEX.HTML
 
-4) GITHUB DESKTOP
------------------
-Summary sugerido:
-  Corregir quiebre a saldo menor o igual a 4.99
+Abre:
 
-Luego:
-  Commit to main
-  Push origin
+    PASO_INDEX_HTML.txt
 
-5) INFORME
+y agrega la línea indicada en web/index.html.
+
+5. PUBLICAR
+
+Publica normalmente en Vercel.
+
+Si Vercel está conectado a GitHub:
+    commit
+    push
+    esperar deploy
+
+6. PRIMERA PRUEBA
+
+Entra a la web.
+
+En el menú debe aparecer:
+
+    Ventas por circuito
+
+7. QUÉ DEBE MOSTRAR
+
+Arriba:
+    Venta Agosto
+    Variación Agosto vs Julio
+    Venta Septiembre al día
+    Variación Septiembre vs Agosto mismos días
+    Circuitos cayendo
+    Clientes VENDE
+
+Tabla:
+    Territorio
+    Ruta
+    Circuito
+    Clientes VENDE
+    Julio
+    Agosto
+    Var. Ago/Jul
+    Septiembre
+    Agosto mismo período
+    Var. Sep/Ago
+    Tendencia
+
+8. COMPARACIÓN DE SEPTIEMBRE
+
+No se compara septiembre parcial contra agosto completo.
+
+Ejemplo:
+si la última data es 04/09:
+
+    Septiembre = 01/09 al 04/09
+    Comparador = 01/08 al 04/08
+
+9. TENDENCIA
+
+    CRECE   = variación > +5%
+    ESTABLE = entre -5% y +5%
+    CAE     = variación < -5%
+    NUEVO   = mes anterior $0 y mes actual > $0
+    SIN BASE = ambos períodos $0
+
+10. ORDEN INICIAL
+
+Primero aparecen los circuitos con mayor caída actual.
+
+11. FILTROS
+
+Puedes filtrar:
+    Territorio
+    Ruta
+    Circuito
+    Tendencia
+
+12. CELULAR
+
+En PC se muestra la tabla completa.
+
+En celular se muestra una vista corta con:
+    Circuito
+    Territorio / Ruta
+    Septiembre
+    Variación actual
+    Agosto
+    Variación Ago/Jul
+    Tendencia
+
+13. CSV
+
+El botón CSV descarga el informe para Excel.
+
+14. VALIDACIÓN
+
+Antes de darlo por terminado, toma 1 circuito conocido.
+
+Revisa 2 o 3 EPIN del circuito y suma algunas disminuciones de saldo.
+Confirma que esas disminuciones forman parte de la venta observada.
+
+IMPORTANTE
 ----------
-El informe mensual mostrara:
-- Clientes que estuvieron en <= $4.99.
-- Horas acumuladas de quiebre.
-- Cantidad de entradas a quiebre.
-- Quiebres que venian desde el mes anterior.
-- Mayor periodo continuo en quiebre.
-- Recuperaciones: cuando vuelve a >= $5.00.
-- Saldo al cierre del mes.
-- Casos >=24h, >=48h y >=72h.
-- Exportacion CSV.
-- Impresion / PDF.
+Este informe NO usa facturación SAP.
 
-Por defecto, el 1 de septiembre de 2026 seleccionara agosto 2026.
+Mide venta observada de saldo según las disminuciones de balance
+que captura el Monitor de Saldos.
