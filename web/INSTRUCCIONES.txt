@@ -1,167 +1,180 @@
-MONITOR DE SALDOS - RUTAS / CIRCUITOS / ID DMS + CSV COMPLETO
-=================================================================
+INFORME DE VENTAS POR CIRCUITO - V1
+===================================
 
-ESTE PARCHE HACE 4 COSAS
-------------------------
-1. Relaciona Telefono EPIN -> ID DMS.
-2. Relaciona Circuito -> Ruta -> Territorio.
-3. Agrega filtros Territorio / Ruta / Circuito al Informe de quiebre.
-4. Corrige la exportacion:
-   - CSV completo = TODOS los casos del mes.
-   - CSV filtrado = solo lo que estes viendo con los filtros.
+QUÉ HACE
+--------
+Crea una nueva pantalla en el Monitor de Saldos:
 
-REGLA DE QUIEBRE
-----------------
-Saldo <= $4.99 = EN QUIEBRE.
-Saldo >= $5.00 = FUERA DE QUIEBRE.
+    Ventas por circuito
 
-PASO 1 - SUPABASE
------------------
-En Supabase > SQL Editor > New query:
-abre y ejecuta TODO:
+Solo toma clientes cuyo Estado DMS actual sea:
 
-  07_MAESTROS_RUTAS_Y_QUIEBRE.sql
+    VENDE
+
+La venta observada se toma de la métrica consumption que el monitor
+ya calcula cuando el balance disminuye.
+
+Ejemplo:
+    saldo anterior = $20
+    saldo nuevo    = $14
+    venta observada = $6
+
+No modifica la ingesta ni borra histórico.
+
+ORDEN EXACTO
+------------
+
+1. RESPALDO
+
+Guarda una copia de:
+
+    web/index.html
+
+No necesitas cambiar app.js.
+
+2. SUPABASE
+
+Entra a:
+
+    Supabase
+    SQL Editor
+    New query
+
+Abre:
+
+    09_INFORME_VENTAS_CIRCUITO.sql
+
+Copia TODO y presiona RUN.
 
 Debe terminar sin error.
 
-Este SQL NO borra el historico de saldos.
-Crea tablas maestras separadas y reemplaza la funcion del informe.
+Este script requiere que ya esté instalado:
 
-PASO 2 - CARPETA WEB
---------------------
-Copia estos 2 archivos dentro de:
+    07_MAESTROS_RUTAS_Y_QUIEBRE.sql
 
-  C:\Users\SAMUEL\Desktop\Monitor_Comportamiento_Saldos\web
+porque usa:
+    monitor_client_master
+    monitor_circuit_master
 
-Archivos:
-  quiebre-report.js
-  master-data-import.js
+3. WEB
 
-Si quiebre-report.js ya existe, reemplazalo.
+Copia:
 
-NO COPIES los CSV de clientes a la carpeta web.
-Contienen datos de clientes y deben quedar fuera de GitHub/Vercel.
+    sales-circuit-report.js
 
-PASO 3 - INDEX.HTML
--------------------
-Al final de web\index.html debe quedar:
+dentro de:
 
-  <script src="./app.js?v=24"></script>
-  <script src="./quiebre-report.js?v=3"></script>
-  <script src="./master-data-import.js?v=1"></script>
+    web\
 
-El v=3 evita que el navegador conserve la version anterior del informe.
+Debe quedar:
 
-PASO 4 - PUBLICAR VERCEL
-------------------------
-Ejecuta:
+    web\sales-circuit-report.js
 
-  web\PUBLICAR_MISMO_PROYECTO.bat
+4. INDEX.HTML
 
-Cuando termine, abre la web y haz Ctrl + F5.
+Abre:
 
-PASO 5 - CARGAR DATOS MAESTROS
-------------------------------
-En la misma web entra a:
+    PASO_INDEX_HTML.txt
 
-  Configuracion
+y agrega la línea indicada en web/index.html.
 
-Abajo aparecera:
+5. PUBLICAR
 
-  DATOS MAESTROS
-  Ruta, circuito y relacion EPIN / DMS
+Publica normalmente en Vercel.
 
-Carga primero:
+Si Vercel está conectado a GitHub:
+    commit
+    push
+    esperar deploy
 
-  clientes_epin_para_importar.csv
+6. PRIMERA PRUEBA
 
-y pulsa:
-  Importar clientes
+Entra a la web.
 
-Espera a que llegue a 100%.
+En el menú debe aparecer:
 
-Luego carga:
+    Ventas por circuito
 
-  circuitos_rutas_para_importar.csv
+7. QUÉ DEBE MOSTRAR
 
-y pulsa:
-  Importar circuitos
+Arriba:
+    Venta Agosto
+    Variación Agosto vs Julio
+    Venta Septiembre al día
+    Variación Septiembre vs Agosto mismos días
+    Circuitos cayendo
+    Clientes VENDE
 
-Espera a que termine.
+Tabla:
+    Territorio
+    Ruta
+    Circuito
+    Clientes VENDE
+    Julio
+    Agosto
+    Var. Ago/Jul
+    Septiembre
+    Agosto mismo período
+    Var. Sep/Ago
+    Tendencia
 
-Los dos CSV limpios vienen dentro de este ZIP.
-La pantalla tambien acepta tus CSV originales si quieres actualizarlos
-en el futuro.
+8. COMPARACIÓN DE SEPTIEMBRE
 
-RESULTADO ESPERADO
-------------------
-El Informe de quiebre ahora mostrara:
+No se compara septiembre parcial contra agosto completo.
 
-  Nivel
-  ID DMS
-  ID Monitor
-  Telefono EPIN
-  Cliente
-  Territorio
-  Ruta
-  Circuito
-  Departamento
-  Ciudad
-  Estado DMS
-  Saldo al cierre
-  Entradas a quiebre
-  Quiebre acumulado
-  Mayor quiebre continuo
-  Estado al cierre
+Ejemplo:
+si la última data es 04/09:
 
-Tambien tendras filtros:
-  Territorio -> Ruta -> Circuito
+    Septiembre = 01/09 al 04/09
+    Comparador = 01/08 al 04/08
 
-EXPORTACION
------------
-CSV completo:
-  descarga TODOS los clientes con quiebre del mes aunque tengas filtros.
+9. TENDENCIA
 
-CSV filtrado:
-  descarga solo el resultado que tengas visible.
+    CRECE   = variación > +5%
+    ESTABLE = entre -5% y +5%
+    CAE     = variación < -5%
+    NUEVO   = mes anterior $0 y mes actual > $0
+    SIN BASE = ambos períodos $0
 
-CASO DE CONTROL
----------------
-EPIN:       75598167
-ID DMS:     235627
-Cliente:    TIENDA CANDELARIA
-Circuito:   SCCW15
-Ruta:       RUTA #6 USULUTAN
-Territorio: Usulutan
+10. ORDEN INICIAL
 
-Si ese caso sale asi, la relacion esta funcionando.
+Primero aparecen los circuitos con mayor caída actual.
 
-NO HAY QUE REINICIAR
---------------------
-No reinicies:
-- agente
-- PC
-- Supabase
+11. FILTROS
 
-Solo hay que publicar Vercel y cargar los maestros una vez.
+Puedes filtrar:
+    Territorio
+    Ruta
+    Circuito
+    Tendencia
 
+12. CELULAR
 
-NOTA SOBRE COBERTURA DE RUTAS
------------------------------
-La base de clientes trae 182 circuitos distintos con EPIN.
-El archivo circuitos(3).csv trae 101 circuitos con ruta.
+En PC se muestra la tabla completa.
 
-Con los archivos recibidos:
-- 10,762 relaciones EPIN -> DMS fueron preparadas.
-- 9,125 tienen una ruta encontrada en circuitos(3).csv.
-- 1,637 EPIN pertenecen a circuitos que no aparecen en ese archivo.
+En celular se muestra una vista corta con:
+    Circuito
+    Territorio / Ruta
+    Septiembre
+    Variación actual
+    Agosto
+    Variación Ago/Jul
+    Tendencia
 
-Esto NO elimina esos clientes del informe:
-- ID DMS y Circuito siguen apareciendo.
-- Ruta queda vacia cuando el circuito no existe en el archivo de rutas.
+13. CSV
 
-Se incluye:
-  circuitos_sin_ruta_en_archivo.csv
+El botón CSV descarga el informe para Excel.
 
-para que puedas revisar los 81 circuitos faltantes si luego quieres
-completar la cobertura de rutas al 100%.
+14. VALIDACIÓN
+
+Antes de darlo por terminado, toma 1 circuito conocido.
+
+Revisa 2 o 3 EPIN del circuito y suma algunas disminuciones de saldo.
+Confirma que esas disminuciones forman parte de la venta observada.
+
+IMPORTANTE
+----------
+Este informe NO usa facturación SAP.
+
+Mide venta observada de saldo según las disminuciones de balance
+que captura el Monitor de Saldos.
