@@ -1,0 +1,180 @@
+INFORME DE VENTAS POR CIRCUITO - V1
+===================================
+
+QUÉ HACE
+--------
+Crea una nueva pantalla en el Monitor de Saldos:
+
+    Ventas por circuito
+
+Solo toma clientes cuyo Estado DMS actual sea:
+
+    VENDE
+
+La venta observada se toma de la métrica consumption que el monitor
+ya calcula cuando el balance disminuye.
+
+Ejemplo:
+    saldo anterior = $20
+    saldo nuevo    = $14
+    venta observada = $6
+
+No modifica la ingesta ni borra histórico.
+
+ORDEN EXACTO
+------------
+
+1. RESPALDO
+
+Guarda una copia de:
+
+    web/index.html
+
+No necesitas cambiar app.js.
+
+2. SUPABASE
+
+Entra a:
+
+    Supabase
+    SQL Editor
+    New query
+
+Abre:
+
+    09_INFORME_VENTAS_CIRCUITO.sql
+
+Copia TODO y presiona RUN.
+
+Debe terminar sin error.
+
+Este script requiere que ya esté instalado:
+
+    07_MAESTROS_RUTAS_Y_QUIEBRE.sql
+
+porque usa:
+    monitor_client_master
+    monitor_circuit_master
+
+3. WEB
+
+Copia:
+
+    sales-circuit-report.js
+
+dentro de:
+
+    web\
+
+Debe quedar:
+
+    web\sales-circuit-report.js
+
+4. INDEX.HTML
+
+Abre:
+
+    PASO_INDEX_HTML.txt
+
+y agrega la línea indicada en web/index.html.
+
+5. PUBLICAR
+
+Publica normalmente en Vercel.
+
+Si Vercel está conectado a GitHub:
+    commit
+    push
+    esperar deploy
+
+6. PRIMERA PRUEBA
+
+Entra a la web.
+
+En el menú debe aparecer:
+
+    Ventas por circuito
+
+7. QUÉ DEBE MOSTRAR
+
+Arriba:
+    Venta Agosto
+    Variación Agosto vs Julio
+    Venta Septiembre al día
+    Variación Septiembre vs Agosto mismos días
+    Circuitos cayendo
+    Clientes VENDE
+
+Tabla:
+    Territorio
+    Ruta
+    Circuito
+    Clientes VENDE
+    Julio
+    Agosto
+    Var. Ago/Jul
+    Septiembre
+    Agosto mismo período
+    Var. Sep/Ago
+    Tendencia
+
+8. COMPARACIÓN DE SEPTIEMBRE
+
+No se compara septiembre parcial contra agosto completo.
+
+Ejemplo:
+si la última data es 04/09:
+
+    Septiembre = 01/09 al 04/09
+    Comparador = 01/08 al 04/08
+
+9. TENDENCIA
+
+    CRECE   = variación > +5%
+    ESTABLE = entre -5% y +5%
+    CAE     = variación < -5%
+    NUEVO   = mes anterior $0 y mes actual > $0
+    SIN BASE = ambos períodos $0
+
+10. ORDEN INICIAL
+
+Primero aparecen los circuitos con mayor caída actual.
+
+11. FILTROS
+
+Puedes filtrar:
+    Territorio
+    Ruta
+    Circuito
+    Tendencia
+
+12. CELULAR
+
+En PC se muestra la tabla completa.
+
+En celular se muestra una vista corta con:
+    Circuito
+    Territorio / Ruta
+    Septiembre
+    Variación actual
+    Agosto
+    Variación Ago/Jul
+    Tendencia
+
+13. CSV
+
+El botón CSV descarga el informe para Excel.
+
+14. VALIDACIÓN
+
+Antes de darlo por terminado, toma 1 circuito conocido.
+
+Revisa 2 o 3 EPIN del circuito y suma algunas disminuciones de saldo.
+Confirma que esas disminuciones forman parte de la venta observada.
+
+IMPORTANTE
+----------
+Este informe NO usa facturación SAP.
+
+Mide venta observada de saldo según las disminuciones de balance
+que captura el Monitor de Saldos.
